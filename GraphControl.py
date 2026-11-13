@@ -2,7 +2,7 @@
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import tkinter as tk
-from Chairlift import Chairlift
+
 
 
 class GraphControl(tk.Frame):
@@ -14,9 +14,10 @@ class GraphControl(tk.Frame):
 
 #fonction pour créer une image
     def creation_image(self):
-        self.figure = Figure(figsize=(6, 3.5))
+        self.figure = Figure(figsize=(6, 3.5), facecolor="black")
         
-        self.axis = self.figure.add_subplot(111)
+        self.axis = self.figure.add_subplot(111, facecolor="black")
+        
         #transforme matplotlib image en image utilisable par tkinter
         self.canvas = FigureCanvasTkAgg(self.figure, master=self)
         #extrait image avec get_tk_widget et place l'image avec .pack
@@ -40,6 +41,7 @@ class GraphControl(tk.Frame):
                     "none":["Aucun paramètre sélectionné"]}      
 
         #Créer les titres concrets qui vont être mis dans le graphique
+        
         titrex = titrex_dic[parametre_obs][0]
         titre = titre_dic[parametre_obs][0]
 
@@ -48,6 +50,11 @@ class GraphControl(tk.Frame):
         self.axis.set(title=titre,
                 xlabel=titrex, 
                 ylabel=titrey)
+        self.axis.yaxis.label.set_color('white')
+        self.axis.xaxis.label.set_color('white')
+        self.axis.title.set_color('white')
+        self.axis.tick_params(color='w', labelcolor='w')
+        
 
         #Cas où aucun paramètre n'est selectionné
         if donnee is None or donnee.size == 0:
