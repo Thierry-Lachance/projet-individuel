@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from tkinter import IntVar, filedialog
+from tkinter import IntVar, filedialog, messagebox
 
 # Constante des paddings pour les widgets de chaque paramètre
 PADDING_EN_Y = 30
@@ -16,12 +16,13 @@ PADDING_EN_X = 10
 
 class Sliders(ctk.CTkFrame) :
 
-    def __init__(self, parent, chairlift, sur_mise_a_jour) :
+    def __init__(self, parent, chairlift, achalandage, sur_mise_a_jour) :
         # Passage du Ctk parent pendant le constructeur, donc pour qu'il soit dans la MainApp
         super().__init__(parent)
 
         # Initialiser le Chairlift courant et appeler la création des widgets
         self.chairlift = chairlift
+        self.achalandage = achalandage
         self.creer_widgets()
         self.mise_a_jour = sur_mise_a_jour
         
@@ -33,6 +34,8 @@ class Sliders(ctk.CTkFrame) :
         self.bouton_importer.grid(row=6, column=0, padx=PADDING_EN_X, pady=20)
         self.bouton_exporter = ctk.CTkButton(self, text="Exporter un CSV", command=self._quand_exporter)
         self.bouton_exporter.grid(row=6, column=1, padx=PADDING_EN_X, pady=20)
+        self.bouton_importerAchalandage = ctk.CTkButton(self, text="Importer l'achalandage", command=self._quand_importerAchalandage)
+        self.bouton_importerAchalandage.grid(row=6, column=2, padx=PADDING_EN_X, pady=20)
 
         # initialiser la variable pour les "radiobutton", empêche que plusieurs soient cochés
         self.radio_var = IntVar(value=0)
@@ -276,12 +279,23 @@ class Sliders(ctk.CTkFrame) :
         self.appliquer_val_sliders()
         print("Bouton importer")
 
+    def _quand_importerAchalandage(self) :
+        chemin = filedialog.askopenfilename(defaultextension=".csv",
+        filetypes=[("Fichiers CSV", "*.csv")])
+        if chemin:
+            if not self.achalandage.importer_achalandage(chemin):
+                messagebox.showerror(
+                    "Erreur d'importation",
+                    "Impossible d'importer l'achalandage depuis ce fichier CSV.",
+                )
+        self.mise_a_jour()
+
     def _quand_exporter(self) :
         chemin = filedialog.asksaveasfilename(defaultextension=".csv",
         filetypes=[("Fichiers CSV", "*.csv")])
         if chemin:
             self.chairlift.exporterVersCSV(chemin)
-        print("Bouton exporter")
+
     
     def reset_radio_var(self) :
         self.radio_var.set(0)

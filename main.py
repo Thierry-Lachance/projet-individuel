@@ -1,3 +1,4 @@
+from Achalandage import Achalandage
 from Sliders import Sliders
 from Chairlift import Chairlift
 from GraphControl import GraphControl
@@ -10,30 +11,37 @@ class MainApp(ctk.CTk) :
         # Initialiser la fenêtre principale
         super().__init__()
         self.title("Gestionnaire de remonte-pente mécanique")
-        self.geometry("1200x700")
+        self.geometry("1400x800")
 
         # Initialiser, en privé, le Chairlift courant
         self.__chairlift = Chairlift()
 
+        # Initialiser, en privé, l'achalandage courant
+        self.__achalandage = Achalandage()
+
         # Initialiser la frame des sliders et autres boutons
         self.grid_rowconfigure(0, weight=1)
-        self.sliders = Sliders(self, self.__chairlift, self.mettre_a_jour)
+        self.sliders = Sliders(self, self.__chairlift, self.__achalandage,  self.mettre_a_jour)
         self.sliders.grid(row=0, column=0, rowspan=3, sticky="nsew", padx=12, pady=12)
 
         # Initialiser la frame du Graphique
         self.graph = GraphControl(self, self.__chairlift)
-        self.graph.grid(row=0, column=1, sticky="nsew", padx=12, pady=12)
+        self.graph.grid(row=0, column=1, columnspan=2, sticky="nsew", padx=12, pady=12)
 
         # Affichage du label du nombre de personnes par heure avec les paramètres courants.
         self.label_nb_personne = ctk.CTkLabel(self, bg_color="white", text="Nombre de personnes par heure : " + str(self.__chairlift.calculerNombreDePersonnesParHeure()), text_color="black")
-        self.label_nb_personne.grid(row=1, column=1, sticky="nsew", padx=10, pady=(0,12))
-        # Bouton de rafraichissement
-        self.bouton_rafraichissement = ctk.CTkButton(self, text="Recalculer", command=self._rafraichissement)
-        self.bouton_rafraichissement.grid(row=2, column=1, sticky="nsew", padx=12, pady=(3,12))
+        self.label_nb_personne.grid(row=1, column=1, columnspan=2, sticky="nsew", padx=10, pady=(0,12))
+        # Bouton de deselection
+        self.bouton_deselection = ctk.CTkButton(self, text="Deselectionner", command=self._rafraichissement)
+        self.bouton_deselection.grid(row=2, column=1, sticky="nsew", padx=12, pady=(3,12))
+        # Bouton qui affiche le graph de l'achalandage
+        self.bouton_achalandage = ctk.CTkButton(self, text="Afficher l'achalandage", command=self.graph.afficher_achalandage)
+        self.bouton_achalandage.grid(row=2, column=2, sticky="nsew", padx=12, pady=(3,12))
 
         # Modifier le poids des différentes colonnes
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(2, weight=1)
         #Configurer les rows du grid
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=0)

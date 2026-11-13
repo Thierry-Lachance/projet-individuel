@@ -61,3 +61,6 @@ class GraphControl(tk.Frame):
 
         self.axis.grid(alpha=0.3)
         self.canvas.draw_idle()
+
+    def afficher_achalandage(self):
+        print("Affichage de l'achalandage")
