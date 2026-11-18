@@ -71,3 +71,5 @@ class GraphControl(tk.Frame):
 
     def afficher_achalandage(self):
         print("Affichage de l'achalandage")
+
+    
