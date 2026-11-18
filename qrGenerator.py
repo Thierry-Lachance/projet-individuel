@@ -1,12 +1,13 @@
 from Chairlift import Chairlift
 import qrcode
 
-def generateQrCode(chairlift: Chairlift):
-    data = chairlift.obtenirLongueurDuTrajet 
-    + chairlift.obtenirNombreDeChaise 
-    + chairlift.obtenirVitesse 
-    + chairlift.obtenirNombreDePersonnesParChaise 
-    + chairlift.obtenirTempsDebarquement 
-    + chairlift.obtenirTempsEmbarquement
+def generateQrCodeExporter(chairlift: Chairlift):
+    data = (str(chairlift.obtenirLongueurDuTrajet())
+        + str(chairlift.obtenirNombreDeChaise())
+        + str(chairlift.obtenirVitesse())
+        + str(chairlift.obtenirNombreDePersonnesParChaise())
+        + str(chairlift.obtenirTempsDebarquement())
+        + str(chairlift.obtenirTempsEmbarquement()))
+    
     img = qrcode.make(data)
-    img.save('MyQRCode1.png')
+    img.show()
