@@ -37,7 +37,7 @@ class Sliders(ctk.CTkFrame) :
         self.bouton_exporter.grid(row=6, column=1, padx=PADDING_EN_X, pady=20)
         self.bouton_importerAchalandage = ctk.CTkButton(self, text="Importer l'achalandage", command=self._quand_importerAchalandage)
         self.bouton_importerAchalandage.grid(row=6, column=2, padx=PADDING_EN_X, pady=20)
-        self.bouton_importerQr = ctk.CTkButton(self, text="Importer d'un code QR")
+        self.bouton_importerQr = ctk.CTkButton(self, text="Importer d'un code QR", command=lambda: qr.decodeQrCode())
         self.bouton_importerQr.grid(row=7, column=0, padx=PADDING_EN_X, pady=20)
         self.bouton_exporterQr = ctk.CTkButton(self, text="Exporter vers un code QR", command=lambda: qr.generateQrCodeExporter(self.chairlift))
         self.bouton_exporterQr.grid(row=7, column=1, padx=PADDING_EN_X, pady=20)
