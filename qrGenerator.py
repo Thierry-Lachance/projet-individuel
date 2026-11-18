@@ -23,4 +23,22 @@ def decodeQrCode():
         raise ValueError("Aucune donnée n'a été trouvée dans le code QR.")
 
     print(data)
+    return data
 
+def prendrePhoto():
+    cam = cv2.VideoCapture(0)
+    if not cam.isOpened():
+        raise RuntimeError("probleme cam")
+
+
+    ret, frame = cam.read()
+
+    if ret:
+        cv2.imwrite("photo.jpg", frame)
+        print("cool phto")
+    else:
+        print("pas cool photo")
+    cam.release()
+
+def importerQrCode():
+    prendrePhoto()
