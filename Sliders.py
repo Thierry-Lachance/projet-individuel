@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from tkinter import IntVar, filedialog, messagebox
+import qrGenerator as qr
 
 # Constante des paddings pour les widgets de chaque paramètre
 PADDING_EN_Y = 30
@@ -36,6 +37,10 @@ class Sliders(ctk.CTkFrame) :
         self.bouton_exporter.grid(row=6, column=1, padx=PADDING_EN_X, pady=20)
         self.bouton_importerAchalandage = ctk.CTkButton(self, text="Importer l'achalandage", command=self._quand_importerAchalandage)
         self.bouton_importerAchalandage.grid(row=6, column=2, padx=PADDING_EN_X, pady=20)
+        self.bouton_importerQr = ctk.CTkButton(self, text="Importer d'un code QR", command=lambda: qr.importerQrCode())
+        self.bouton_importerQr.grid(row=7, column=0, padx=PADDING_EN_X, pady=20)
+        self.bouton_exporterQr = ctk.CTkButton(self, text="Exporter vers un code QR", command=lambda: qr.generateQrCodeExporter(self.chairlift))
+        self.bouton_exporterQr.grid(row=7, column=1, padx=PADDING_EN_X, pady=20)
 
         # initialiser la variable pour les "radiobutton", empêche que plusieurs soient cochés
         self.radio_var = IntVar(value=0)
@@ -54,7 +59,7 @@ class Sliders(ctk.CTkFrame) :
         self.creer_widgets_capacite()
 
         # Configurer les colonnes pour qu'ils prennent le frame, lorsqu'elle est étirée
-        for i in range(7) :
+        for i in range(8) :
             self.grid_rowconfigure(i, weight=1)
         
         
