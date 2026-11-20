@@ -45,8 +45,8 @@ def importerQrCode():
     prendrePhoto()
 
 def ouvrirRemoteCam():
-    data = "http://" + obtenirIp()
-    print(obtenirIp)
+    data = "http://" + obtenirIp() + "/"
+    print(obtenirIp())
         
     img = qrcode.make(data)
     img.show()

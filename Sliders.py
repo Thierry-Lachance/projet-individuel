@@ -41,6 +41,8 @@ class Sliders(ctk.CTkFrame) :
         self.bouton_importerQr.grid(row=7, column=0, padx=PADDING_EN_X, pady=20)
         self.bouton_exporterQr = ctk.CTkButton(self, text="Exporter vers un code QR", command=lambda: qr.generateQrCodeExporter(self.chairlift))
         self.bouton_exporterQr.grid(row=7, column=1, padx=PADDING_EN_X, pady=20)
+        self.bouton_importerWeb = ctk.CTkButton(self, text="Ouvrir la caméra distante", command=lambda: qr.ouvrirRemoteCam())
+        self.bouton_importerWeb.grid(row=7, column=2, padx=PADDING_EN_X, pady=20)
 
         # initialiser la variable pour les "radiobutton", empêche que plusieurs soient cochés
         self.radio_var = IntVar(value=0)
