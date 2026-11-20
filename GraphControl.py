@@ -92,12 +92,12 @@ class GraphControl(tk.Frame):
             file_attente.append(restante)
 
         self.axis.clear()
-        couleurs = ["tab:red" if nombre > 0 else "tab:green" for nombre in file_attente]
+
         self.axis.bar(
             heures,
             file_attente,
             width=0.8,
-            color=couleurs,
+            color="tab:red",
             label=f"File d'attente (capacité : {capacite} personnes/heure)",
         )
 
