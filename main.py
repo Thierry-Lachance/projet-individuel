@@ -25,7 +25,7 @@ class MainApp(ctk.CTk) :
         self.sliders.grid(row=0, column=0, rowspan=3, sticky="nsew", padx=12, pady=12)
 
         # Initialiser la frame du Graphique
-        self.graph = GraphControl(self, self.__chairlift)
+        self.graph = GraphControl(self, self.__chairlift, self.__achalandage)
         self.graph.grid(row=0, column=1, columnspan=2, sticky="nsew", padx=12, pady=12)
 
         # Affichage du label du nombre de personnes par heure avec les paramètres courants.
@@ -59,6 +59,7 @@ class MainApp(ctk.CTk) :
     # Commande du bouton de rafraichissement qui recalcule et déselectionne
     def _rafraichissement(self) :
         self.sliders.reset_radio_var()
+        self.graph.afficher_parametres()
         
         self.label_nb_personne.configure(text="Nombre de personnes par heure : " + str(self.__chairlift.calculerNombreDePersonnesParHeure()))
 
