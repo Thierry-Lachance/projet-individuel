@@ -1,6 +1,7 @@
 from Chairlift import Chairlift
 import cv2
 import qrcode
+import socket
 
 def generateQrCodeExporter(chairlift: Chairlift):
     data = (str(chairlift.obtenirLongueurDuTrajet()) + "/"
@@ -42,3 +43,13 @@ def prendrePhoto():
 
 def importerQrCode():
     prendrePhoto()
+
+def ouvrirRemoteCam():
+    data = "http://" + obtenirIp()
+    print(obtenirIp)
+        
+    img = qrcode.make(data)
+    img.show()
+
+def obtenirIp():
+    return socket.gethostbyname(socket.gethostname())
