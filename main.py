@@ -4,6 +4,10 @@ from Chairlift import Chairlift
 from GraphControl import GraphControl
 
 import customtkinter as ctk
+from http.server import HTTPServer
+from threading import Thread
+
+from web.webServer import Serv
 
 class MainApp(ctk.CTk) :
 
@@ -68,4 +72,11 @@ if __name__ == "__main__" :
     ctk.set_appearance_mode("system")
     ctk.set_default_color_theme("blue")
     application = MainApp()
-    application.mainloop()
+    httpd = HTTPServer(("localhost", 8080), Serv)
+    server_thread = Thread(target=httpd.serve_forever, daemon=True)
+    server_thread.start()
+    try:
+        application.mainloop()
+    finally:
+        httpd.shutdown()
+        httpd.server_close()

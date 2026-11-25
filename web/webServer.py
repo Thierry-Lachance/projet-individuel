@@ -1,11 +1,9 @@
-
-
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse
 
 class Serv(BaseHTTPRequestHandler):
-
+    
     def do_GET(self):
         requested_path = urlparse(self.path).path
         if requested_path == '/':
@@ -20,6 +18,3 @@ class Serv(BaseHTTPRequestHandler):
             self.send_response(404)
         self.end_headers()
         self.wfile.write(bytes(file_to_open, 'utf-8'))
-
-httpd = HTTPServer(('localhost',8080),Serv)
-httpd.serve_forever()
