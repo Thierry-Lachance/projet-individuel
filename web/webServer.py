@@ -1,4 +1,4 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -9,7 +9,14 @@ class Serv(BaseHTTPRequestHandler):
         if requested_path == '/':
             requested_path = '/index.html'
 
-        file_path = Path(__file__).parent / requested_path.lstrip('/')
+        root = Path(__file__).resolve().parent
+        file_path = (root / requested_path.lstrip('/')).resolve()
+        try:
+            file_path.relative_to(root)
+        except ValueError:
+            self.send_error(404)
+            return
+
         try:
             file_to_open = file_path.read_text(encoding='utf-8')
             self.send_response(200)

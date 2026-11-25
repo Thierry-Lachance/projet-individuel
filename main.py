@@ -72,7 +72,7 @@ if __name__ == "__main__" :
     ctk.set_appearance_mode("system")
     ctk.set_default_color_theme("blue")
     application = MainApp()
-    httpd = HTTPServer(("localhost", 8080), Serv)
+    httpd = HTTPServer(("0.0.0.0", 8080), Serv)
     server_thread = Thread(target=httpd.serve_forever, daemon=True)
     server_thread.start()
     try:
