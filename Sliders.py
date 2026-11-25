@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import cv2
+from PIL import Image
 from tkinter import IntVar, filedialog, messagebox
 import qrGenerator as qr
 
@@ -24,6 +26,7 @@ class Sliders(ctk.CTkFrame) :
         # Initialiser le Chairlift courant et appeler la création des widgets
         self.chairlift = chairlift
         self.achalandage = achalandage
+        self._fenetre_scanner_qr: ctk.CTkToplevel | None = None
         self.creer_widgets()
         self.mise_a_jour = sur_mise_a_jour
         
@@ -37,7 +40,7 @@ class Sliders(ctk.CTkFrame) :
         self.bouton_exporter.grid(row=6, column=1, padx=PADDING_EN_X, pady=20)
         self.bouton_importerAchalandage = ctk.CTkButton(self, text="Importer l'achalandage", command=self._quand_importerAchalandage)
         self.bouton_importerAchalandage.grid(row=6, column=2, padx=PADDING_EN_X, pady=20)
-        self.bouton_importerQr = ctk.CTkButton(self, text="Importer d'un code QR", command=lambda: qr.importerQrCode())
+        self.bouton_importerQr = ctk.CTkButton(self, text="Importer d'un code QR", command=self._quand_importerQr)
         self.bouton_importerQr.grid(row=7, column=0, padx=PADDING_EN_X, pady=20)
         self.bouton_exporterQr = ctk.CTkButton(self, text="Exporter vers un code QR", command=lambda: qr.generateQrCodeExporter(self.chairlift))
         self.bouton_exporterQr.grid(row=7, column=1, padx=PADDING_EN_X, pady=20)
@@ -64,6 +67,96 @@ class Sliders(ctk.CTkFrame) :
         for i in range(8) :
             self.grid_rowconfigure(i, weight=1)
         
+    def _quand_importerQr(self) -> None:
+        if self._fenetre_scanner_qr is not None and self._fenetre_scanner_qr.winfo_exists():
+            self._fenetre_scanner_qr.focus_force()
+            return
+
+        camera = cv2.VideoCapture(0)
+        if not camera.isOpened():
+            camera.release()
+            messagebox.showerror(
+                "Caméra indisponible",
+                "Impossible d'ouvrir la caméra de cet ordinateur.",
+                parent=self,
+            )
+            return
+
+        fenetre = ctk.CTkToplevel(self)
+        self._fenetre_scanner_qr = fenetre
+        fenetre.title("Importer un code QR")
+        fenetre.geometry("700x580")
+        fenetre.transient(self.winfo_toplevel())
+        fenetre.grab_set()
+
+        etiquette_apercu = ctk.CTkLabel(fenetre, text="Démarrage de la caméra...")
+        etiquette_apercu.pack(padx=10, pady=10)
+        etiquette_statut = ctk.CTkLabel(
+            fenetre, text="Présentez un code QR exporté devant la caméra."
+        )
+        etiquette_statut.pack(padx=10, pady=5)
+
+        bouton_fermer = ctk.CTkButton(fenetre, text="Annuler")
+        bouton_fermer.pack(padx=10, pady=10)
+
+        detecteur = cv2.QRCodeDetector()
+        image_apercu = None
+
+        def fermer_scanner() -> None:
+            camera.release()
+            self._fenetre_scanner_qr = None
+            if fenetre.winfo_exists():
+                fenetre.destroy()
+
+        def lire_image() -> None:
+            nonlocal image_apercu
+            if not fenetre.winfo_exists():
+                camera.release()
+                self._fenetre_scanner_qr = None
+                return
+
+            lecture_reussie, cadre = camera.read()
+            if not lecture_reussie:
+                camera.release()
+                etiquette_statut.configure(text="Impossible de lire la caméra.")
+                bouton_fermer.configure(text="Fermer")
+                return
+
+            cadre_apercu = cv2.cvtColor(cadre, cv2.COLOR_BGR2RGB)
+            cadre_apercu = cv2.resize(cadre_apercu, (640, 480))
+            image = Image.fromarray(cadre_apercu)
+            image_apercu = ctk.CTkImage(
+                light_image=image,
+                dark_image=image,
+                size=(640, 480),
+            )
+            etiquette_apercu.configure(image=image_apercu, text="")
+
+            donnees = qr.decoderQrDepuisCadre(cadre, detecteur)
+            if donnees:
+                try:
+                    qr.analyserDonneesQr(donnees)
+                except ValueError as erreur:
+                    etiquette_statut.configure(text=f"Code QR invalide : {erreur}")
+                else:
+                    camera.release()
+                    try:
+                        self.appliquer_donnees_qr(donnees)
+                    except ValueError as erreur:
+                        etiquette_statut.configure(text=str(erreur))
+                    else:
+                        etiquette_statut.configure(
+                            text=f"Code QR détecté : {donnees}"
+                        )
+                    bouton_fermer.configure(text="Fermer")
+                    return
+
+            fenetre.after(60, lire_image)
+
+        bouton_fermer.configure(command=fermer_scanner)
+        fenetre.protocol("WM_DELETE_WINDOW", fermer_scanner)
+        fenetre.after(0, lire_image)
+
         
     # Les suivantes sont appelées pour créer sliders, texte et boutons, etc. de chacun des paramètres.
     # Le fonctionnement de celles-ci est identique dépendant des paramètres, l'explication est donc seulement fait une fois.
@@ -329,4 +422,29 @@ class Sliders(ctk.CTkFrame) :
         
         self.slider_vitesse.set(self.chairlift.obtenirVitesse())
         self.text_vitesse.configure(text=str(self.chairlift.obtenirVitesse()) + " m/s")
+
+    def appliquer_donnees_qr(self, donnees: str) -> None:
+        (
+            longueur,
+            nombre_chaises,
+            vitesse,
+            capacite,
+            temps_debarquement,
+            temps_embarquement,
+        ) = qr.analyserDonneesQr(donnees)
+
+        self.reset_radio_var()
+        valeurs_appliquees = (
+            self.chairlift.definirLongueurDuTrajet(longueur),
+            self.chairlift.definirNombreDeChaise(nombre_chaises),
+            self.chairlift.definirVitesse(vitesse),
+            self.chairlift.definirNombreDePersonnesParChaise(capacite),
+            self.chairlift.definirTempsDebarquement(temps_debarquement),
+            self.chairlift.definirTempsEmbarquement(temps_embarquement),
+        )
+        if not all(valeurs_appliquees):
+            raise ValueError("Les valeurs du code QR n'ont pas pu être appliquées.")
+
+        self.appliquer_val_sliders()
+        self.mise_a_jour()
         

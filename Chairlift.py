@@ -31,7 +31,7 @@ class Chairlift:
             return False
     #setter pour la longueur du trajet du chairlift
     def definirLongueurDuTrajet(self, longueurDuTrajet):
-        if longueurDuTrajet > 0:
+        if longueurDuTrajet >= 0:
             self.__longueurDuTrajet = longueurDuTrajet
             return True
         else:

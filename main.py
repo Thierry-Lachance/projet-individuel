@@ -4,6 +4,8 @@ from Chairlift import Chairlift
 from GraphControl import GraphControl
 
 import customtkinter as ctk
+from queue import Empty, Queue
+from tkinter import messagebox
 
 from web.webServer import ServeurWeb
 
@@ -12,6 +14,7 @@ class MainApp(ctk.CTk) :
     def __init__(self) :
         # Initialiser la fenêtre principale
         super().__init__()
+        self._qr_en_attente: Queue[str] = Queue()
         self.title("Gestionnaire de remonte-pente mécanique")
         self.geometry("1400x800")
 
@@ -51,6 +54,26 @@ class MainApp(ctk.CTk) :
 
         # Appeler mettre à jour qui met à jour l'image/le graph
         self.mettre_a_jour()
+        self.after(100, self._appliquer_qr_en_attente)
+
+    def recevoir_qr(self, donnees: str) -> None:
+        self._qr_en_attente.put(donnees)
+
+    def _appliquer_qr_en_attente(self) -> None:
+        donnees = None
+        try:
+            while True:
+                donnees = self._qr_en_attente.get_nowait()
+        except Empty:
+            pass
+
+        if donnees is not None:
+            try:
+                self.sliders.appliquer_donnees_qr(donnees)
+            except ValueError as erreur:
+                messagebox.showerror("Code QR invalide", str(erreur))
+
+        self.after(100, self._appliquer_qr_en_attente)
 
     # Mettre à jour le graphique 
     def mettre_a_jour(self):
@@ -70,7 +93,7 @@ if __name__ == "__main__" :
     ctk.set_appearance_mode("system")
     ctk.set_default_color_theme("blue")
     application = MainApp()
-    serveur_web = ServeurWeb()
+    serveur_web = ServeurWeb(application.recevoir_qr)
     serveur_web.demarrer()
     try:
         application.mainloop()
