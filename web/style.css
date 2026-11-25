@@ -1,0 +1,29 @@
+body {
+  background: #000000;
+  color: #f9fafb;
+  font: 16px sans-serif;
+  margin: 0;
+  padding: 24px;
+  text-align: center;
+}
+
+video {
+  background: #000;
+  border-radius: 12px;
+  max-width: 100%;
+  width: 720px;
+}
+
+button {
+  background: #eb2525;
+  border: 0;
+  border-radius: 8px;
+  color: white;
+  font-size: 16px;
+  padding: 12px 20px;
+}
+
+#statut {
+  color: #ffffff;
+  margin: 16px 0;
+}

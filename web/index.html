@@ -3,10 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Page Web</title>
+    <title>Caméra externe</title>
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <h1>Ma Page Web</h1>
-    <p>Bienvenue sur ma page web.</p>
+    <h1>Caméra externe</h1>
+    <p id="statut">Click pour démarrer la détection</p>
+    <video id="video" autoplay playsinline muted></video>
+    <br>
+    <button id="demarrer">Démarrer la détection</button>
+    <canvas id="canevas" hidden></canvas>
+    <script src="/script.js"></script>
 </body>
 </html>
