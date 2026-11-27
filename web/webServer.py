@@ -26,7 +26,7 @@ class ServeurWeb:
         self._verrou_image = Lock()
         self._verrou_qr = Lock()
         self._serveurs: list[BaseWSGIServer] = []
-        self._threads: list[Thread] = []
+        self._fils_execution: list[Thread] = []
         self._configurer_routes()
 
     def _configurer_routes(self) -> None:
@@ -103,21 +103,21 @@ class ServeurWeb:
             raise
 
         self._serveurs = serveurs
-        self._threads = [
+        self._fils_execution = [
             Thread(target=serveur.serve_forever, daemon=True)
             for serveur in self._serveurs
         ]
-        for thread in self._threads:
-            thread.start()
+        for fil_execution in self._fils_execution:
+            fil_execution.start()
 
     def arreter(self) -> None:
         for serveur in self._serveurs:
             serveur.shutdown()
             serveur.server_close()
-        for thread in self._threads:
-            thread.join()
+        for fil_execution in self._fils_execution:
+            fil_execution.join()
         self._serveurs.clear()
-        self._threads.clear()
+        self._fils_execution.clear()
 
     def derniere_image(self) -> bytes | None:
         with self._verrou_image:

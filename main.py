@@ -19,28 +19,28 @@ class MainApp(ctk.CTk) :
         self.geometry("1400x800")
 
         # Initialiser, en privé, le Chairlift courant
-        self.__chairlift = Chairlift()
+        self.__remonte_mecanique = Chairlift()
 
         # Initialiser, en privé, l'achalandage courant
         self.__achalandage = Achalandage()
 
         # Initialiser la frame des sliders et autres boutons
         self.grid_rowconfigure(0, weight=1)
-        self.sliders = Sliders(self, self.__chairlift, self.__achalandage,  self.mettre_a_jour)
-        self.sliders.grid(row=0, column=0, rowspan=3, sticky="nsew", padx=12, pady=12)
+        self.panneau_commandes = Sliders(self, self.__remonte_mecanique, self.__achalandage,  self.mettre_a_jour)
+        self.panneau_commandes.grid(row=0, column=0, rowspan=3, sticky="nsew", padx=12, pady=12)
 
         # Initialiser la frame du Graphique
-        self.graph = GraphControl(self, self.__chairlift, self.__achalandage)
-        self.graph.grid(row=0, column=1, columnspan=2, sticky="nsew", padx=12, pady=12)
+        self.graphique = GraphControl(self, self.__remonte_mecanique, self.__achalandage)
+        self.graphique.grid(row=0, column=1, columnspan=2, sticky="nsew", padx=12, pady=12)
 
         # Affichage du label du nombre de personnes par heure avec les paramètres courants.
-        self.label_nb_personne = ctk.CTkLabel(self, bg_color="white", text="Nombre de personnes par heure : " + str(self.__chairlift.calculerNombreDePersonnesParHeure()), text_color="black")
+        self.label_nb_personne = ctk.CTkLabel(self, bg_color="white", text="Nombre de personnes par heure : " + str(self.__remonte_mecanique.calculerNombreDePersonnesParHeure()), text_color="black")
         self.label_nb_personne.grid(row=1, column=1, columnspan=2, sticky="nsew", padx=10, pady=(0,12))
         # Bouton de deselection
         self.bouton_deselection = ctk.CTkButton(self, text="Deselectionner", command=self._rafraichissement)
         self.bouton_deselection.grid(row=2, column=1, sticky="nsew", padx=12, pady=(3,12))
         # Bouton qui affiche le graph de l'achalandage
-        self.bouton_achalandage = ctk.CTkButton(self, text="Afficher l'achalandage", command=self.graph.afficher_achalandage)
+        self.bouton_achalandage = ctk.CTkButton(self, text="Afficher l'achalandage", command=self.graphique.afficher_achalandage)
         self.bouton_achalandage.grid(row=2, column=2, sticky="nsew", padx=12, pady=(3,12))
 
         # Modifier le poids des différentes colonnes
@@ -69,7 +69,7 @@ class MainApp(ctk.CTk) :
 
         if donnees is not None:
             try:
-                self.sliders.appliquer_donnees_qr(donnees)
+                self.panneau_commandes.appliquer_donnees_qr(donnees)
             except ValueError as erreur:
                 messagebox.showerror("Code QR invalide", str(erreur))
 
@@ -77,16 +77,16 @@ class MainApp(ctk.CTk) :
 
     # Mettre à jour le graphique 
     def mettre_a_jour(self):
-        self.graph.mise_a_jour_image()
+        self.graphique.mise_a_jour_image()
         
-        self.label_nb_personne.configure(text="Nombre de personnes par heure : " + str(self.__chairlift.calculerNombreDePersonnesParHeure()))
+        self.label_nb_personne.configure(text="Nombre de personnes par heure : " + str(self.__remonte_mecanique.calculerNombreDePersonnesParHeure()))
 
     # Commande du bouton de rafraichissement qui recalcule et déselectionne
     def _rafraichissement(self) :
-        self.sliders.reset_radio_var()
-        self.graph.afficher_parametres()
+        self.panneau_commandes.reinitialiser_variable_radio()
+        self.graphique.afficher_parametres()
         
-        self.label_nb_personne.configure(text="Nombre de personnes par heure : " + str(self.__chairlift.calculerNombreDePersonnesParHeure()))
+        self.label_nb_personne.configure(text="Nombre de personnes par heure : " + str(self.__remonte_mecanique.calculerNombreDePersonnesParHeure()))
 
 #Loop du MainApp et choix de l'apparence du ctk
 if __name__ == "__main__" :

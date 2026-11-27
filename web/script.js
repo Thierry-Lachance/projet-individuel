@@ -1,31 +1,31 @@
-const elementVideo = document.getElementById("video");
+const element_video = document.getElementById("video");
 const canevas = document.getElementById("canevas");
 const statut = document.getElementById("statut");
-let fluxVideo;
-let minuterieEnvoi;
+let flux_video;
+let minuterie_envoi;
 
 async function envoyerImage() {
-  if (!fluxVideo) return;
-  if (elementVideo.readyState < 2) {
-    minuterieEnvoi = setTimeout(envoyerImage, 200);
+  if (!flux_video) return;
+  if (element_video.readyState < 2) {
+    minuterie_envoi = setTimeout(envoyerImage, 200);
     return;
   }
 
-  canevas.width = elementVideo.videoWidth;
-  canevas.height = elementVideo.videoHeight;
-  canevas.getContext("2d").drawImage(elementVideo, 0, 0);
-  const blobImage = await new Promise((resoudre) =>
+  canevas.width = element_video.videoWidth;
+  canevas.height = element_video.videoHeight;
+  canevas.getContext("2d").drawImage(element_video, 0, 0);
+  const image_binaire = await new Promise((resoudre) =>
     canevas.toBlob(resoudre, "image/jpeg", 0.8)
   );
-  if (!blobImage) {
-    minuterieEnvoi = setTimeout(envoyerImage, 200);
+  if (!image_binaire) {
+    minuterie_envoi = setTimeout(envoyerImage, 200);
     return;
   }
 
   try {
     const reponse = await fetch("/api/frame", {
       method: "POST",
-      body: blobImage,
+      body: image_binaire,
       headers: {"Content-Type": "image/jpeg"},
     });
     if (!reponse.ok) {
@@ -34,30 +34,30 @@ async function envoyerImage() {
 
     const resultat = await reponse.json();
     if (resultat.qr_valide) {
-      arreterFluxCamera();
+      arreter_flux_camera();
       statut.textContent = "Code QR détecté : " + resultat.donnees_qr;
       return;
     }
   } catch (erreur) {
-    arreterFluxCamera();
+    arreter_flux_camera();
     statut.textContent = "Erreur d'envoi de l'image : " + erreur.message;
     return;
   }
 
-  minuterieEnvoi = setTimeout(envoyerImage, 200);
+  minuterie_envoi = setTimeout(envoyerImage, 200);
 }
 
-function arreterFluxCamera() {
-  clearTimeout(minuterieEnvoi);
-  if (fluxVideo) {
-    fluxVideo.getTracks().forEach((piste) => piste.stop());
+function arreter_flux_camera() {
+  clearTimeout(minuterie_envoi);
+  if (flux_video) {
+    flux_video.getTracks().forEach((piste) => piste.stop());
   }
-  fluxVideo = null;
-  elementVideo.srcObject = null;
+  flux_video = null;
+  element_video.srcObject = null;
 }
 
-async function demarrerDetection() {
-  if (fluxVideo) return;
+async function demarrer_detection() {
+  if (flux_video) return;
 
   if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     statut.textContent = "L'accès à la caméra nécessite HTTPS ou localhost.";
@@ -65,11 +65,11 @@ async function demarrerDetection() {
   }
 
   try {
-    fluxVideo = await navigator.mediaDevices.getUserMedia({
+    flux_video = await navigator.mediaDevices.getUserMedia({
       video: {facingMode: {ideal: "environment"}},
       audio: false,
     });
-    elementVideo.srcObject = fluxVideo;
+    element_video.srcObject = flux_video;
     statut.textContent = "Recherche d'un code QR...";
     envoyerImage();
   } catch (erreur) {
@@ -77,5 +77,5 @@ async function demarrerDetection() {
   }
 }
 
-document.getElementById("demarrer").onclick = demarrerDetection;
-window.addEventListener("pagehide", arreterFluxCamera);
+document.getElementById("demarrer").onclick = demarrer_detection;
+window.addEventListener("pagehide", arreter_flux_camera);

@@ -26,8 +26,8 @@ class Achalandage:
 
             self.achalandage = donnees
             return True
-        except (OSError, ValueError, KeyError) as e:
-            print(f"Erreur lors de l'importation de l'achalandage : {e}")
+        except (OSError, ValueError, KeyError) as erreur:
+            print(f"Erreur lors de l'importation de l'achalandage : {erreur}")
             return False
 
     def obtenir_achalandage(self):

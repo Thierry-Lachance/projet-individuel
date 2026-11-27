@@ -4,16 +4,16 @@ import numpy as np
 import qrcode
 import socket
 
-def generateQrCodeExporter(chairlift: Chairlift):
-    data = (str(chairlift.obtenirLongueurDuTrajet()) + "/"
-        + str(chairlift.obtenirNombreDeChaise()) + "/"
-        + str(chairlift.obtenirVitesse()) + "/"
-        + str(chairlift.obtenirNombreDePersonnesParChaise()) + "/"
-        + str(chairlift.obtenirTempsDebarquement()) + "/"
-        + str(chairlift.obtenirTempsEmbarquement()) + ">")
+def generer_code_qr_exporter(remonte_mecanique: Chairlift):
+    donnees = (str(remonte_mecanique.obtenirLongueurDuTrajet()) + "/"
+        + str(remonte_mecanique.obtenirNombreDeChaise()) + "/"
+        + str(remonte_mecanique.obtenirVitesse()) + "/"
+        + str(remonte_mecanique.obtenirNombreDePersonnesParChaise()) + "/"
+        + str(remonte_mecanique.obtenirTempsDebarquement()) + "/"
+        + str(remonte_mecanique.obtenirTempsEmbarquement()) + ">")
     
-    img = qrcode.make(data)
-    img.show()
+    image = qrcode.make(donnees)
+    image.show()
 
 
 def decoderQrDepuisCadre(cadre: np.ndarray, detecteur=None) -> str | None:
@@ -68,13 +68,12 @@ def analyserDonneesQr(donnees: str) -> tuple[int, int, float, int, int, int]:
         temps_debarquement,
         temps_embarquement,
     )
-
-def ouvrirRemoteCam():
-    data = "https://" + obtenirIp() + ":8443/"
-    print(data)
+def ouvrir_camera_distante():
+    donnees = "https://" + obtenir_adresse_ip() + ":8443/"
+    print(donnees)
         
-    img = qrcode.make(data)
-    img.show()
+    image = qrcode.make(donnees)
+    image.show()
 
-def obtenirIp():
+def obtenir_adresse_ip():
     return socket.gethostbyname(socket.gethostname())
