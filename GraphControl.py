@@ -76,23 +76,24 @@ class GraphControl(tk.Frame):
 
     def afficher_achalandage(self):
         self.mode_achalandage = True
-        heures = list(range(24))
+        heures = list(range(24)) #creation d'une liste de 0 a 23 pour les heures
 
         if self.achalandage is None:
             arrivees = [0] * 24
         else:
             arrivees = self.achalandage.obtenir_achalandage()
 
-        capacite = self.modele.calculerNombreDePersonnesParHeure()
+        capacite = self.modele.calculerNombreDePersonnesParHeure()# calcule la capacite du chairlift
         file_attente = []
         restante = 0
 
         for nombre_arrivants in arrivees:
-            restante = max(0, restante + nombre_arrivants - capacite)
+            restante = max(0, restante + nombre_arrivants - capacite)# prend le monde restant de l'heure d'avant et on ajoute la difference de capacite de service(max pour pas de no -)
             file_attente.append(restante)
 
         self.axe.clear()
 
+        #formatage du graphique
         self.axe.bar(
             heures,
             file_attente,
@@ -100,7 +101,7 @@ class GraphControl(tk.Frame):
             color="tab:red",
             label=f"File d'attente (capacité : {capacite} personnes/heure)",
         )
-
+        # titres et labels
         self.axe.set(
             title="File d'attente selon l'heure",
             xlabel="Heure",
@@ -116,6 +117,7 @@ class GraphControl(tk.Frame):
         self.axe.legend()
         self.canevas.draw_idle()
 
+    #fonction pour revenir a l'affichage des parametres
     def afficher_parametres(self):
         self.mode_achalandage = False
         self.mise_a_jour_image()

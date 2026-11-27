@@ -7,7 +7,7 @@ from werkzeug.serving import BaseWSGIServer, make_server
 
 from qrGenerator import analyserDonneesQr, decoderQrDepuisImage
 
-
+"""PUISQUE CE FICHIER EST PLUS AVANCER IL CONTIENT DES COMMENTAIRES SUPLEMENTAIRE POUR PROUVER QUE JE SUIS L'AUTEUR"""
 class ServeurWeb:
     def __init__(
         self,

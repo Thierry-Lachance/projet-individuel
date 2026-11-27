@@ -55,10 +55,10 @@ class MainApp(ctk.CTk) :
         # Appeler mettre à jour qui met à jour l'image/le graph
         self.mettre_a_jour()
         self.after(100, self._appliquer_qr_en_attente)
-
+    # interface avec le server web pour le transfert de code qr
     def recevoir_qr(self, donnees: str) -> None:
         self._qr_en_attente.put(donnees)
-
+    # applique les donnees du code si dispo sinon on passe en reessai dans 100ms
     def _appliquer_qr_en_attente(self) -> None:
         donnees = None
         try:
@@ -69,7 +69,7 @@ class MainApp(ctk.CTk) :
 
         if donnees is not None:
             try:
-                self.panneau_commandes.appliquer_donnees_qr(donnees)
+                self.panneau_commandes.appliquer_donnees_qr(donnees)#applique les donnees au sliders
             except ValueError as erreur:
                 messagebox.showerror("Code QR invalide", str(erreur))
 
@@ -93,9 +93,9 @@ if __name__ == "__main__" :
     ctk.set_appearance_mode("system")
     ctk.set_default_color_theme("blue")
     application = MainApp()
-    serveur_web = ServeurWeb(application.recevoir_qr)
+    serveur_web = ServeurWeb(application.recevoir_qr)#utilisation des ports par default
     serveur_web.demarrer()
     try:
         application.mainloop()
     finally:
-        serveur_web.arreter()
+        serveur_web.arreter()#ne pas oublier d'eteindre la page web

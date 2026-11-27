@@ -8,14 +8,7 @@ import qrGenerator as qr
 MARGE_EN_Y = 30
 MARGE_EN_X = 10
 
-"""LEGENDE radio var et ordre des curseurs"""
-"------------------------------------------"
-"Longueur cable :     1"
-"Nombre chaise :      2"
-"Vitesse :            3"
-"Temps embarquement : 4"
-"Temps debarquement : 5"
-"Capacite chaise :    6"
+
 
 class Sliders(ctk.CTkFrame) :
 
@@ -42,9 +35,9 @@ class Sliders(ctk.CTkFrame) :
         self.bouton_importerAchalandage.grid(row=6, column=2, padx=MARGE_EN_X, pady=20)
         self.bouton_importer_code_qr = ctk.CTkButton(self, text="Importer d'un code QR", command=self._quand_importer_code_qr)
         self.bouton_importer_code_qr.grid(row=7, column=0, padx=MARGE_EN_X, pady=20)
-        self.bouton_exporter_code_qr = ctk.CTkButton(self, text="Exporter vers un code QR", command=lambda: qr.generer_code_qr_exporter(self.remonte_mecanique))
+        self.bouton_exporter_code_qr = ctk.CTkButton(self, text="Exporter vers un code QR", command=lambda: qr.generer_code_qr_exporter(self.remonte_mecanique))#TODO parler
         self.bouton_exporter_code_qr.grid(row=7, column=1, padx=MARGE_EN_X, pady=20)
-        self.bouton_camera_distante = ctk.CTkButton(self, text="Ouvrir la caméra distante", command=lambda: qr.ouvrir_camera_distante())
+        self.bouton_camera_distante = ctk.CTkButton(self, text="Ouvrir la caméra distante", command=lambda: qr.ouvrir_camera_distante())#lambda pour pas runner la fonction avant le click
         self.bouton_camera_distante.grid(row=7, column=2, padx=MARGE_EN_X, pady=20)
 
         # initialiser la variable pour les "radiobutton", empêche que plusieurs soient cochés
@@ -66,14 +59,14 @@ class Sliders(ctk.CTkFrame) :
         # Configurer les colonnes pour qu'ils prennent le frame, lorsqu'elle est étirée
         for i in range(8) :
             self.grid_rowconfigure(i, weight=1)
-        
+    # fonction utiliser lorsque on importe de la cam de l'ordinateur    
     def _quand_importer_code_qr(self) -> None:
-        if self._fenetre_scanner_qr is not None and self._fenetre_scanner_qr.winfo_exists():
+        if self._fenetre_scanner_qr is not None and self._fenetre_scanner_qr.winfo_exists():# si la fenetre existe on la place au top
             self._fenetre_scanner_qr.focus_force()
             return
 
-        camera = cv2.VideoCapture(0)
-        if not camera.isOpened():
+        camera = cv2.VideoCapture(0)#source de la cam 0 -> cam ordi
+        if not camera.isOpened():#safety cam dispo
             camera.release()
             messagebox.showerror(
                 "Caméra indisponible",
@@ -82,6 +75,7 @@ class Sliders(ctk.CTkFrame) :
             )
             return
 
+        #construction de la fenetre du detecteur
         fenetre = ctk.CTkToplevel(self)
         self._fenetre_scanner_qr = fenetre
         fenetre.title("Importer un code QR")
@@ -102,26 +96,27 @@ class Sliders(ctk.CTkFrame) :
         detecteur = cv2.QRCodeDetector()
         image_apercu = None
 
-        def fermer_scanner() -> None:
+        def fermer_scanner() -> None:#ferme la fenetre et libere la cam
             camera.release()
             self._fenetre_scanner_qr = None
             if fenetre.winfo_exists():
                 fenetre.destroy()
 
-        def lire_image() -> None:
+        def lire_image() -> None:# fonction qui lit l'image de la cam et detecte le code qr
             nonlocal image_apercu
             if not fenetre.winfo_exists():
                 camera.release()
                 self._fenetre_scanner_qr = None
                 return
 
-            lecture_reussie, cadre = camera.read()
-            if not lecture_reussie:
+            lecture_reussie, cadre = camera.read()#lecture du frame
+            if not lecture_reussie:# safety si lecture impossible
                 camera.release()
                 etiquette_statut.configure(text="Impossible de lire la caméra.")
                 bouton_fermer.configure(text="Fermer")
                 return
 
+            #apercu dans l'app
             cadre_apercu = cv2.cvtColor(cadre, cv2.COLOR_BGR2RGB)
             cadre_apercu = cv2.resize(cadre_apercu, (640, 480))
             image = Image.fromarray(cadre_apercu)
@@ -132,13 +127,14 @@ class Sliders(ctk.CTkFrame) :
             )
             etiquette_apercu.configure(image=image_apercu, text="")
 
+
             donnees = qr.decoderQrDepuisCadre(cadre, detecteur)
-            if donnees:
+            if donnees:#verifie si donnes est pas vide
                 try:
-                    qr.analyserDonneesQr(donnees)
+                    qr.analyserDonneesQr(donnees)#analyse
                 except ValueError as erreur:
                     etiquette_statut.configure(text=f"Code QR invalide : {erreur}")
-                else:
+                else:# si pas d'erreur on applique les donnees
                     camera.release()
                     try:
                         self.appliquer_donnees_qr(donnees)
@@ -151,11 +147,11 @@ class Sliders(ctk.CTkFrame) :
                     bouton_fermer.configure(text="Fermer")
                     return
 
-            fenetre.after(60, lire_image)
+            fenetre.after(60, lire_image)#si pas de code qr on reessaye dans 60ms
 
-        bouton_fermer.configure(command=fermer_scanner)
-        fenetre.protocol("WM_DELETE_WINDOW", fermer_scanner)
-        fenetre.after(0, lire_image)
+        bouton_fermer.configure(command=fermer_scanner)#configure le bouton de fermeture
+        fenetre.protocol("WM_DELETE_WINDOW", fermer_scanner)#gestion de la fermeture de la fenetre
+        fenetre.after(0, lire_image)#lance la lecture
 
         
     # Les suivantes sont appelées pour créer curseurs, texte et boutons, etc. de chacun des paramètres.
@@ -379,6 +375,7 @@ class Sliders(ctk.CTkFrame) :
         self.appliquer_valeurs_curseurs()
         print("Bouton importer")
 
+    #importation de l'achalandage a partir du path
     def _quand_importerAchalandage(self) :
         chemin = filedialog.askopenfilename(defaultextension=".csv",
         filetypes=[("Fichiers CSV", "*.csv")])
@@ -390,13 +387,14 @@ class Sliders(ctk.CTkFrame) :
                 )
         self.mise_a_jour()
 
+    #exportation
     def _quand_exporter(self) :
         chemin = filedialog.asksaveasfilename(defaultextension=".csv",
         filetypes=[("Fichiers CSV", "*.csv")])
         if chemin:
             self.remonte_mecanique.exporterVersCSV(chemin)
 
-    
+    #mettre les valeurs a 0
     def reinitialiser_variable_radio(self) :
         self.variable_radio.set(0)
         self._actualiser_curseur()
@@ -423,6 +421,7 @@ class Sliders(ctk.CTkFrame) :
         self.curseur_vitesse.set(self.remonte_mecanique.obtenirVitesse())
         self.text_vitesse.configure(text=str(self.remonte_mecanique.obtenirVitesse()) + " m/s")
 
+    #appliquation des donnees a partir du tuple de la detection
     def appliquer_donnees_qr(self, donnees: str) -> None:
         (
             longueur,
@@ -434,6 +433,7 @@ class Sliders(ctk.CTkFrame) :
         ) = qr.analyserDonneesQr(donnees)
 
         self.reinitialiser_variable_radio()
+        #appliquation des donnees sur les setters
         valeurs_appliquees = (
             self.remonte_mecanique.definirLongueurDuTrajet(longueur),
             self.remonte_mecanique.definirNombreDeChaise(nombre_chaises),
@@ -442,7 +442,7 @@ class Sliders(ctk.CTkFrame) :
             self.remonte_mecanique.definirTempsDebarquement(temps_debarquement),
             self.remonte_mecanique.definirTempsEmbarquement(temps_embarquement),
         )
-        if not all(valeurs_appliquees):
+        if not all(valeurs_appliquees):#validation que c'est valide
             raise ValueError("Les valeurs du code QR n'ont pas pu être appliquées.")
 
         self.appliquer_valeurs_curseurs()
