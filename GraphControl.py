@@ -18,12 +18,12 @@ class GraphControl(tk.Frame):
     def creation_image(self):
         self.figure = Figure(figsize=(6, 3.5), facecolor="black")
         
-        self.axis = self.figure.add_subplot(111, facecolor="black")
+        self.axe = self.figure.add_subplot(111, facecolor="black")
         
         #transforme matplotlib image en image utilisable par tkinter
-        self.canvas = FigureCanvasTkAgg(self.figure, master=self)
+        self.canevas = FigureCanvasTkAgg(self.figure, master=self)
         #extrait image avec get_tk_widget et place l'image avec .pack
-        self.canvas.get_tk_widget().pack(fill="both", expand=True)
+        self.canevas.get_tk_widget().pack(fill="both", expand=True)
 
 
 #fonction pour que l'image puisse changer lors de la modification des parametres
@@ -35,7 +35,7 @@ class GraphControl(tk.Frame):
         donnee = self.modele.obtenirDonneesGraphique(11,0,10)
 
         #Création dictionnaire des noms d'axe des x possible et accesseur de paramètre ajouté
-        parametre_obs = self.modele.obtenirParametreObserver()
+        parametre_obs = self.modele.obtenirParametreObserve()
 
         #Création attribut du titre de l'axe des x
         titrex_dic ={"vitesse":["Vitesse"], "nombreDeChaise":["Nombre de chaise"], "longueurDuTrajet":["Longueur du trajet"],
@@ -51,28 +51,28 @@ class GraphControl(tk.Frame):
         titre = titre_dic[parametre_obs][0]
 
         #Ajouter les bons axes au graphique
-        self.axis.clear()
-        self.axis.set(title=titre,
+        self.axe.clear()
+        self.axe.set(title=titre,
                 xlabel=titrex, 
                 ylabel=titrey)
-        self.axis.yaxis.label.set_color('white')
-        self.axis.xaxis.label.set_color('white')
-        self.axis.title.set_color('white')
-        self.axis.tick_params(color='w', labelcolor='w')
+        self.axe.yaxis.label.set_color('white')
+        self.axe.xaxis.label.set_color('white')
+        self.axe.title.set_color('white')
+        self.axe.tick_params(color='w', labelcolor='w')
         
 
         #Cas où aucun paramètre n'est selectionné
         if donnee is None or donnee.size == 0:
-            self.axis.text(0.5,0.5,"Aucune données", transform=self.axis.transAxes,
+            self.axe.text(0.5,0.5,"Aucune données", transform=self.axe.transAxes,
                 ha="center", va="center")
         
         else:
             x,y = donnee.T
-            self.axis.plot(x, y, label=titre)
-            self.axis.legend()
+            self.axe.plot(x, y, label=titre)
+            self.axe.legend()
 
-        self.axis.grid(alpha=0.3)
-        self.canvas.draw_idle()
+        self.axe.grid(alpha=0.3)
+        self.canevas.draw_idle()
 
     def afficher_achalandage(self):
         self.mode_achalandage = True
@@ -91,30 +91,30 @@ class GraphControl(tk.Frame):
             restante = max(0, restante + nombre_arrivants - capacite)
             file_attente.append(restante)
 
-        self.axis.clear()
-        couleurs = ["tab:red" if nombre > 0 else "tab:green" for nombre in file_attente]
-        self.axis.bar(
+        self.axe.clear()
+
+        self.axe.bar(
             heures,
             file_attente,
             width=0.8,
-            color=couleurs,
+            color="tab:red",
             label=f"File d'attente (capacité : {capacite} personnes/heure)",
         )
 
-        self.axis.set(
+        self.axe.set(
             title="File d'attente selon l'heure",
             xlabel="Heure",
             ylabel="Personnes en attente",
         )
-        self.axis.set_xticks(heures)
-        self.axis.set_xticklabels([f"{heure}:00" for heure in heures], rotation=45)
-        self.axis.yaxis.label.set_color("white")
-        self.axis.xaxis.label.set_color("white")
-        self.axis.title.set_color("white")
-        self.axis.tick_params(color="w", labelcolor="w")
-        self.axis.grid(axis="y", alpha=0.3)
-        self.axis.legend()
-        self.canvas.draw_idle()
+        self.axe.set_xticks(heures)
+        self.axe.set_xticklabels([f"{heure}:00" for heure in heures], rotation=45)
+        self.axe.yaxis.label.set_color("white")
+        self.axe.xaxis.label.set_color("white")
+        self.axe.title.set_color("white")
+        self.axe.tick_params(color="w", labelcolor="w")
+        self.axe.grid(axis="y", alpha=0.3)
+        self.axe.legend()
+        self.canevas.draw_idle()
 
     def afficher_parametres(self):
         self.mode_achalandage = False

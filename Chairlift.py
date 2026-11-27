@@ -12,7 +12,7 @@ class Chairlift:
         self.__tempsEmbarquement = 0 # s
         self.__tempsDebarquement = 0 # s
 
-        self.__parametreObserver = "none"
+        self.__parametreObserve = "none"
 
     #setter pour la vitesse de deplacement du chairlift
     def definirVitesse(self, vitesse):
@@ -31,7 +31,7 @@ class Chairlift:
             return False
     #setter pour la longueur du trajet du chairlift
     def definirLongueurDuTrajet(self, longueurDuTrajet):
-        if longueurDuTrajet > 0:
+        if longueurDuTrajet >= 0:
             self.__longueurDuTrajet = longueurDuTrajet
             return True
         else:
@@ -60,9 +60,9 @@ class Chairlift:
         else:
             return False
     #setter pour le paramètre observé du chairlift    
-    def definirParametreObserver(self, parametreObserver):
-        if parametreObserver in ["vitesse", "nombreDeChaise", "longueurDuTrajet", "tempsEmbarquement", "tempsDebarquement", "nombreDePersonnesParChaise", "none"]:
-            self.__parametreObserver = parametreObserver
+    def definirParametreObserve(self, parametreObserve):
+        if parametreObserve in ["vitesse", "nombreDeChaise", "longueurDuTrajet", "tempsEmbarquement", "tempsDebarquement", "nombreDePersonnesParChaise", "none"]:
+            self.__parametreObserve = parametreObserve
             return True
         else:
             return False
@@ -112,22 +112,22 @@ class Chairlift:
     #calculer le nombre de personnes par heure en fonction du paramètre observé et de la valeur du paramètre manquant. Utile pour la génération de graphique. Le paramètre observé est celui qui est modifié dans le graphique.
     def calculerNombreDePersonnesParametreManquant(self, valeurParametre):
         try:
-            if self.__parametreObserver == "vitesse":
+            if self.__parametreObserve == "vitesse":
                 return int((3600 / (2*(self.__longueurDuTrajet/valeurParametre) + self.__tempsEmbarquement + self.__tempsDebarquement)) * self.__nombreDeChaise * self.__nombreDePersonnesParChaise)
             
-            elif self.__parametreObserver == "nombreDeChaise":
+            elif self.__parametreObserve == "nombreDeChaise":
                 return int((3600 / (2*(self.__longueurDuTrajet/self.__vitesse) + self.__tempsEmbarquement + self.__tempsDebarquement)) * valeurParametre * self.__nombreDePersonnesParChaise)
             
-            elif self.__parametreObserver == "longueurDuTrajet":
+            elif self.__parametreObserve == "longueurDuTrajet":
                 return int((3600 / (2*(valeurParametre/self.__vitesse) + self.__tempsEmbarquement + self.__tempsDebarquement)) * self.__nombreDeChaise * self.__nombreDePersonnesParChaise)
             
             
-            elif self.__parametreObserver == "nombreDePersonnesParChaise":
+            elif self.__parametreObserve == "nombreDePersonnesParChaise":
                 return int((3600 / (2*(self.__longueurDuTrajet/self.__vitesse) + self.__tempsEmbarquement + self.__tempsDebarquement)) * self.__nombreDeChaise * valeurParametre)
-            elif self.__parametreObserver == "tempsEmbarquement":
+            elif self.__parametreObserve == "tempsEmbarquement":
                 return int((3600 / (2*(self.__longueurDuTrajet/self.__vitesse) + valeurParametre + self.__tempsDebarquement)) * self.__nombreDeChaise * self.__nombreDePersonnesParChaise)
                                 
-            elif self.__parametreObserver == "tempsDebarquement":
+            elif self.__parametreObserve == "tempsDebarquement":
                 return int((3600 / (2*(self.__longueurDuTrajet/self.__vitesse) + self.__tempsEmbarquement + valeurParametre)) * self.__nombreDeChaise * self.__nombreDePersonnesParChaise)
                         
             else:
@@ -146,8 +146,8 @@ class Chairlift:
         return np.column_stack((abscisses, ordonnees))
 
     #getter pour le paramètre observé du chairlift
-    def obtenirParametreObserver(self):
-        return self.__parametreObserver
+    def obtenirParametreObserve(self):
+        return self.__parametreObserve
 
     #exporter les paramètres du chairlift vers un fichier CSV
     def exporterVersCSV(self, chemin):
@@ -185,8 +185,8 @@ class Chairlift:
                     definisseur, convertir = definisseurs[nom]
                     if not definisseur(convertir(ligne["Valeur"])):
                         raise ValueError(f"Valeur invalide pour {nom} : {ligne['Valeur']}")
-        except (OSError, ValueError, KeyError) as error:
-            print("Chargement impossible :", error)
+        except (OSError, ValueError, KeyError) as erreur:
+            print("Chargement impossible :", erreur)
 
     #fonction pour tester le fonctionnement de la classe
     def tester(self):
